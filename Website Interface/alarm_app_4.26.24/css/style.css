@@ -1,0 +1,139 @@
+
+body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+h3 {
+    margin-top: 10dpx;
+    margin-bottom: 2px;
+    color: #333;
+
+}
+li:before {
+    color: green;
+}
+  
+li:nth-child(1):before {
+color: green;
+}
+
+li:nth-child(2):before {
+color: red;
+}
+
+li:nth-child(3):before {
+color: blue;
+}
+
+ol {
+    margin-bottom: 5px;
+}
+
+/* Style for numbered list without numbers */
+ol.no-numbers {
+    list-style-type: none;
+    padding-left: 15px;
+    margin: 0px;
+    color: #006eb8;
+}
+
+form{
+    /* borders added for visibility. Just remove them */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    height: auto;
+}
+form.left {
+    /* Float both forms to the left */
+    float: left; 
+}
+
+form.right {
+    /* Float both forms to the right */
+    float: right; 
+}
+
+form.fake {
+    float: left;
+    width: 300px;
+    height: 0px;
+    box-shadow: none;
+    padding: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+/* Custom styling for dropdown options */
+select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+    margin-bottom: 10px;
+}
+
+/* Style for each option */
+select option {
+    padding: 10px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Hover effect on options */
+select option:hover {
+    background-color: #e0e0e0;
+}
+
+/* Selected option style */
+select option:checked {
+    background-color: #3498db;
+    color: #fff;
+}
+
+input,
+button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #4caf50;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+input:disabled {
+    background-color: #eee;
+}
