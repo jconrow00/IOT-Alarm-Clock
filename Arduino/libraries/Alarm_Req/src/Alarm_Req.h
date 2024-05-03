@@ -22,13 +22,15 @@ class ServerClass {
   int m_baud_rate;          //the functioning rate for the ESP32
 
  public:
-  ServerClass( String clock_id, String wifi_ssid, String wifi_pswd, 
-              String server_ip, String handler_folder, int baud_rate);
-
+  ServerClass(String clock_id, String wifi_ssid, 
+              String wifi_pswd, String server_ip, 
+              String handler_folder, int baud_rate);
+  void init();
   int req_alarm_cnt();                  //returns number of alarms on clock
   String req_alarm_time(int alarm_num); //returns alarm time of index, alarm_num
   int req_alarm_toggle(int alarm_num);	//returns alarm toggle of index, alarm_num
-  
+  String req_clock_time();	            //returns clock time
+
   // returns members
   String getID() { return m_clock_id; } 
   String getSSID() { return m_wifi_ssid; }
@@ -38,11 +40,6 @@ class ServerClass {
   int getBaud() { return m_baud_rate; }
 };
 
-extern ServerClass Server;
-// class AlarmClass {
-//  private:
-  
-// };
 
 #endif
 

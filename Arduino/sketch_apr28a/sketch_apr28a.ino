@@ -16,6 +16,8 @@
 const String WIFI_SSID = "joseph";          //USER ENTERED
 const String WIFI_PASSWORD = "greenball";        //USER ENTERED
 const String CLOCK_ID = "48";                     //USER ENTERED
+// Set thevolume (0-100)
+#define VOLUME 10
 
 
 const String HOST_NAME = "54.190.183.82"; 
@@ -28,8 +30,8 @@ const int BAUD_RATE = 115200;
 #define I2S_LRC   25
  
 // Define button connections
-#define BUTTON_SNOOZE_READ 32
-#define BUTTON_SNOOZE_WRITE 34
+#define BUTTON_SNOOZE_READ 34
+#define BUTTON_SNOOZE_WRITE 32
 #define BUTTON_RESET_READ 12
 #define BUTTON_RESET_WRITE 14
 
@@ -67,12 +69,12 @@ void setup() {
   initialize_screen();
 
   // // Initialize the button read/write pins
-  // pinMode(BUTTON_SNOOZE_WRITE, OUTPUT);
-  // pinMode(BUTTON_RESET_WRITE, OUTPUT);
-  // pinMode(BUTTON_SNOOZE_READ, INPUT);
-  // pinMode(BUTTON_RESET_READ, INPUT);
-  // digitalWrite(BUTTON_SNOOZE_WRITE, HIGH);
-  // digitalWrite(BUTTON_RESET_WRITE, HIGH);
+  pinMode(BUTTON_SNOOZE_WRITE, OUTPUT);
+  pinMode(BUTTON_RESET_WRITE, OUTPUT);
+  pinMode(BUTTON_SNOOZE_READ, INPUT);
+  pinMode(BUTTON_RESET_READ, INPUT);
+  digitalWrite(BUTTON_SNOOZE_WRITE, HIGH);
+  digitalWrite(BUTTON_RESET_WRITE, HIGH);
 
   // Initialize the rtc object
   rtc.begin();
@@ -146,7 +148,7 @@ void setup() {
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
  
   // Set thevolume (0-100)
-  audio.setVolume(6);
+  audio.setVolume(VOLUME);
  
   // Connect to an Internet radio station (select one as desired)
   //audio.connecttohost("http://vis.media-ice.musicradio.com/CapitalMP3");
@@ -160,7 +162,7 @@ void setup() {
 
 void loop() {
   // Test the radio music connection before normal operation
-  while (counter < 3000){
+  while (counter < 35000){
     audio.loop();
     counter++;
     // Serial.printf("init Loop\n");    //TEMP
@@ -240,10 +242,22 @@ void loop() {
         update_screen(hh, mm, ss);
       }
       audio.loop();
-      // if (nearest_toggle && digitalRead(BUTTON_SNOOZE_READ)){
-      //   // 5 minute snooze
-      //   delay(300000);
-      // }
+      // if snooze enabled and snooze button is pressed
+      if (nearest_toggle && digitalRead(BUTTON_SNOOZE_READ)){
+        // (Testing purposes snooze = 10sec) Real product shall be 5 minutes
+        for (int i = 0; i < 10; i++){
+          now = rtc.now();
+          hh = now.hour();
+          mm = now.minute();
+          ss = now.second();
+          update_screen(hh, mm, ss);
+          delay(1000);
+        }
+      }
+      // if reset button is pressed
+      if (digitalRead(BUTTON_RESET_READ)){
+        break;
+      }
     }
   }
 }

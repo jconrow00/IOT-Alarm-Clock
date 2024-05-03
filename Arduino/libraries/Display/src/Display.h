@@ -6,7 +6,7 @@
 
 
 void initialize_screen(void);
-static uint8_t conv2d(const char* p);
-void update_screen(byte hh, byte mm, byte ss);
+//static uint8_t conv2d(const char* p);
+void update_screen(int hh, int mm, int ss);
 
 #endif
