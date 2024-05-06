@@ -11,13 +11,13 @@
 #include "Audio.h"
 #include <Display.h>
 
-// const String WIFI_SSID = "EndyasCurfew";          //USER ENTERED
-// const String WIFI_PASSWORD = "fivethirty";        //USER ENTERED
-const String WIFI_SSID = "joseph";          //USER ENTERED
-const String WIFI_PASSWORD = "greenball";        //USER ENTERED
+const String WIFI_SSID = "EndyasCurfew";          //USER ENTERED
+const String WIFI_PASSWORD = "fivethirty";        //USER ENTERED
+// const String WIFI_SSID = "joseph";          //USER ENTERED
+// const String WIFI_PASSWORD = "greenball";        //USER ENTERED
 const String CLOCK_ID = "48";                     //USER ENTERED
 // Set thevolume (0-100)
-#define VOLUME 10
+#define VOLUME 12
 
 
 const String HOST_NAME = "54.190.183.82"; 
@@ -43,8 +43,8 @@ Audio audio;
 DateTime now;
 
 int counter = 0;
-String alarm_arr[40];
-String nearest_alarm;
+String alarm_arr[65];
+String nearest_alarm = "-1:-1:-1";  // these "-1" values will keep the alarm from alarming if no alarms are set
 int nearest_toggle;
 int hh;
 int mm;
@@ -76,16 +76,6 @@ void setup() {
   digitalWrite(BUTTON_SNOOZE_WRITE, HIGH);
   digitalWrite(BUTTON_RESET_WRITE, HIGH);
 
-  // Initialize the rtc object
-  rtc.begin();
-  if (! rtc.begin()) {
-    Serial.println("Could not find RTC! Check circuit.");
-    while (1);
-  }
-  now = rtc.now();
-  hh = now.hour();
-  mm = now.minute();
-  ss = now.second();
 
   // Requests initial time from Server
   char currentBuffer[20];
@@ -140,8 +130,18 @@ void setup() {
     // Serial.printf("\t\tNearest - %d:%d:%d\n", nearestHourInt, nearestMinuteInt, atoi(nearestSecond));   //TEMP
   }
 
+  // Initialize the rtc object
+  rtc.begin();
+  if (! rtc.begin()) {
+    Serial.println("Could not find RTC! Check circuit.");
+    while (1);
+  }
+  now = rtc.now();
+  hh = now.hour();
+  mm = now.minute();
+  ss = now.second();
   // Hard coding RTC time as Jan 30, 2000
-  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond)));
+  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond) + 5));
 
   //Radio setup
   // Connect MAX98357 I2S Amplifier Module
