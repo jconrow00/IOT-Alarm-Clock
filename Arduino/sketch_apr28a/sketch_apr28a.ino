@@ -85,6 +85,19 @@ void setup() {
   const char *currentMinute = strtok(NULL, myD);
   const char *currentSecond = strtok(NULL, myD);
 
+  // Initialize the rtc object
+  rtc.begin();
+  if (! rtc.begin()) {
+    Serial.println("Could not find RTC! Check circuit.");
+    while (1);
+  }
+  now = rtc.now();
+  hh = now.hour();
+  mm = now.minute();
+  ss = now.second();
+  // Hard coding RTC time as Jan 30, 2000
+  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond) + 5));
+
   // Initializes the nearest alarm time
   int alarm_cnt = server.req_alarm_cnt();
   for (int i = 1; i <= alarm_cnt; i++){
@@ -130,18 +143,7 @@ void setup() {
     // Serial.printf("\t\tNearest - %d:%d:%d\n", nearestHourInt, nearestMinuteInt, atoi(nearestSecond));   //TEMP
   }
 
-  // Initialize the rtc object
-  rtc.begin();
-  if (! rtc.begin()) {
-    Serial.println("Could not find RTC! Check circuit.");
-    while (1);
-  }
-  now = rtc.now();
-  hh = now.hour();
-  mm = now.minute();
-  ss = now.second();
-  // Hard coding RTC time as Jan 30, 2000
-  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond) + 5));
+
 
   //Radio setup
   // Connect MAX98357 I2S Amplifier Module
