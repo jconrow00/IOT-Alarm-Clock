@@ -11,10 +11,10 @@
 #include "Audio.h"
 #include <Display.h>
 
-const String WIFI_SSID = "EndyasCurfew";          //USER ENTERED
-const String WIFI_PASSWORD = "fivethirty";        //USER ENTERED
-// const String WIFI_SSID = "joseph";          //USER ENTERED
-// const String WIFI_PASSWORD = "greenball";        //USER ENTERED
+// const String WIFI_SSID = "EndyasCurfew";          //USER ENTERED
+// const String WIFI_PASSWORD = "fivethirty";        //USER ENTERED
+const String WIFI_SSID = "joseph";          //USER ENTERED
+const String WIFI_PASSWORD = "greenball";        //USER ENTERED
 const String CLOCK_ID = "48";                     //USER ENTERED
 // Set thevolume (0-100)
 #define VOLUME 12
@@ -44,6 +44,7 @@ DateTime now;
 
 int counter = 0;
 String alarm_arr[65];
+int toggle_arr[65];
 String nearest_alarm = "-1:-1:-1";  // these "-1" values will keep the alarm from alarming if no alarms are set
 int nearest_toggle;
 int hh;
@@ -96,23 +97,25 @@ void setup() {
   mm = now.minute();
   ss = now.second();
   // Hard coding RTC time as Jan 30, 2000
-  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond) + 5));
+  rtc.adjust(DateTime(2000, 1, 30, atoi(currentHour), atoi(currentMinute), atoi(currentSecond)));
 
   // Initializes the nearest alarm time
   int alarm_cnt = server.req_alarm_cnt();
-  for (int i = 1; i <= alarm_cnt; i++){
-    // Enters the database's alarms to local global array
-    alarm_arr[i] = server.req_alarm_time(i);
-    char alarmBuffer[20];
-    strcpy(alarmBuffer, alarm_arr[i].c_str());
-    const char *alarmHour = strtok(alarmBuffer, myD);
-    const char *alarmMinute = strtok(NULL, myD);
-    const char *alarmSecond = "00";
+    for (int i = 1; i <= alarm_cnt; i++){
+      // Enters the database's alarms to local global array
+      toggle_arr[i] = server.req_alarm_toggle(i);
+      alarm_arr[i] = server.req_alarm_time(i);
+      char alarmBuffer[20];
+      strcpy(alarmBuffer, alarm_arr[i].c_str());
+      const char *myD = ":";
+      const char *alarmHour = strtok(alarmBuffer, myD);
+      const char *alarmMinute = strtok(NULL, myD);
+      const char *alarmSecond = "00";
 
-    if (i == 1) {
-      nearest_alarm = server.req_alarm_time(alarm_cnt);
-      nearest_toggle = server.req_alarm_toggle(alarm_cnt);
-    }
+      if (i == 1) {
+        nearest_alarm = server.req_alarm_time(alarm_cnt);
+        nearest_toggle = server.req_alarm_toggle(alarm_cnt);
+      }
     char nearestBuffer[20];
     strcpy(nearestBuffer, nearest_alarm.c_str());
     const char *nearestHour = strtok(nearestBuffer, myD);
@@ -134,13 +137,15 @@ void setup() {
             (alarmHourInt < nearestHourInt || 
             (alarmHourInt == nearestHourInt && alarmMinuteInt < nearestMinuteInt))) {
             nearest_alarm = alarm_arr[i];
-            nearest_toggle = server.req_alarm_toggle(i);
+            nearest_toggle = toggle_arr[i];
         }
     }
+    // TODO Add nearest roll over
 
-    // Serial.printf("Current - %d:%d:%d\n", currentHourInt, currentMinuteInt, atoi(currentSecond));   //TEMP
-    // Serial.printf("\tAlarm - %d:%d:%d\n", alarmHourInt, alarmMinuteInt, atoi(alarmSecond));   //TEMP
-    // Serial.printf("\t\tNearest - %d:%d:%d\n", nearestHourInt, nearestMinuteInt, atoi(nearestSecond));   //TEMP
+
+    Serial.printf("Current - %d:%d:%d\n", currentHourInt, currentMinuteInt, atoi(currentSecond));   //TEMP
+    Serial.printf("\tAlarm - %d:%d:%d\n", alarmHourInt, alarmMinuteInt, atoi(alarmSecond));   //TEMP
+    Serial.printf("\t\tNearest - %d:%d:%d\n", nearestHourInt, nearestMinuteInt, atoi(nearestSecond));   //TEMP
   }
 
 
@@ -163,11 +168,13 @@ void setup() {
 }
 
 void loop() {
+  // while(true){
+  //   audio.loop();
+  // }
   // Test the radio music connection before normal operation
-  while (counter < 35000){
+  while (counter < 70000){
     audio.loop();
     counter++;
-    // Serial.printf("init Loop\n");    //TEMP
   }
 
   // update visible time only if it differs from current time
@@ -181,12 +188,22 @@ void loop() {
   }
 
   // Only updates alarm times and nearest alarm every ~5 minutes
-  if (mm % 5 == 0 && ss > 5 && ss < 10){
+  // TEMP: *every 1 minute
+  if (mm % 1 == 0 && ss > 5 && ss < 10){
     // Requests alarms from database via http GET
     int alarm_cnt = server.req_alarm_cnt();
     // Initializes the nearest alarm time
     for (int i = 1; i <= alarm_cnt; i++){
+      now = rtc.now();
+      if (ss != now.second()){
+        hh = now.hour();
+        mm = now.minute();
+        ss = now.second();
+        update_screen(hh, mm, ss);
+      }
+
       // Enters the database's alarms to local global array
+      toggle_arr[i] = server.req_alarm_toggle(i);
       alarm_arr[i] = server.req_alarm_time(i);
       char alarmBuffer[20];
       strcpy(alarmBuffer, alarm_arr[i].c_str());
@@ -216,9 +233,13 @@ void loop() {
               (alarmHourInt < atoi(nearestHour) || 
               (alarmHourInt == atoi(nearestHour) && alarmMinuteInt < atoi(nearestMinute)))) {
               nearest_alarm = alarm_arr[i];
-              nearest_toggle = server.req_alarm_toggle(i);
+              nearest_toggle = toggle_arr[i];
           }
       }
+      // TODO Add nearest roll over
+      Serial.printf("Current - %d:%d:%d\n", hh, mm, ss);   //TEMP
+      Serial.printf("\tAlarm - %d:%d:%d\n", alarmHourInt, alarmMinuteInt, atoi(alarmSecond));                 //TEMP
+      Serial.printf("\t\tNearest - %d:%d:%d\n", atoi(nearestHour), atoi(nearestMinute), atoi(nearestSecond));   //TEMP
     }
   }
   // now = rtc.now();     //TEMP
@@ -235,6 +256,7 @@ void loop() {
   if (hh == atoi(hour) && mm == atoi(minute) && ss == atoi(second)){
     // while (!digitalRead(BUTTON_RESET_READ)){
     while(true){
+      Serial.print("ALARMing");     //TEMP
       // only updates if the second changes
       now = rtc.now();
       if (ss != now.second()){
@@ -258,6 +280,48 @@ void loop() {
       }
       // if reset button is pressed
       if (digitalRead(BUTTON_RESET_READ)){
+        // if reset, find next nearest alarm
+        // Requests alarms from database via http GET
+        int alarm_cnt = server.req_alarm_cnt();
+        // Initializes the nearest alarm time
+        for (int i = 1; i <= alarm_cnt; i++){
+          // Enters the database's alarms to local global array
+          toggle_arr[i] = server.req_alarm_toggle(i);
+          alarm_arr[i] = server.req_alarm_time(i);
+          char alarmBuffer[20];
+          strcpy(alarmBuffer, alarm_arr[i].c_str());
+          const char *myD = ":";
+          const char *alarmHour = strtok(alarmBuffer, myD);
+          const char *alarmMinute = strtok(NULL, myD);
+          const char *alarmSecond = "00";
+
+          if (i == 1) {
+            nearest_alarm = server.req_alarm_time(alarm_cnt);
+            nearest_toggle = server.req_alarm_toggle(alarm_cnt);
+          }
+          char nearestBuffer[20];
+          strcpy(nearestBuffer, nearest_alarm.c_str());
+          const char *nearestHour = strtok(nearestBuffer, myD);
+          const char *nearestMinute = strtok(NULL, myD);
+          const char *nearestSecond = "00";
+        
+          // Compare with current time
+          int alarmHourInt = atoi(alarmHour);
+          int alarmMinuteInt = atoi(alarmMinute);
+
+          if ((alarmHourInt > hh) || 
+              (alarmHourInt == hh && alarmMinuteInt > mm)) {
+              // Update nearest_alarm if this alarm is closer
+              if (nearest_alarm == "" || 
+                  (alarmHourInt < atoi(nearestHour) || 
+                  (alarmHourInt == atoi(nearestHour) && alarmMinuteInt < atoi(nearestMinute)))) {
+                  nearest_alarm = alarm_arr[i];
+                  nearest_toggle = toggle_arr[i];
+              }
+          }
+          // TODO Add nearest roll over
+        }
+
         break;
       }
     }
