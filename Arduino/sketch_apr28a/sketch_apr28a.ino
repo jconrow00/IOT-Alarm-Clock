@@ -15,6 +15,8 @@
 // const String WIFI_PASSWORD = "fivethirty";        //USER ENTERED
 const String WIFI_SSID = "joseph";          //USER ENTERED
 const String WIFI_PASSWORD = "greenball";        //USER ENTERED
+// const String WIFI_SSID = "DESKTOP";          //USER ENTERED
+// const String WIFI_PASSWORD = "spot1234";        //USER ENTERED
 const String CLOCK_ID = "48";                     //USER ENTERED
 // Set thevolume (0-100)
 #define VOLUME 12
@@ -43,8 +45,8 @@ Audio audio;
 DateTime now;
 
 int counter = 0;
-String alarm_arr[65];
-int toggle_arr[65];
+String alarm_arr[100];
+int toggle_arr[100];
 String nearest_alarm = "-1:-1:-1";  // these "-1" values will keep the alarm from alarming if no alarms are set
 int nearest_toggle;
 int hh;
@@ -161,7 +163,7 @@ void setup() {
   //audio.connecttohost("http://vis.media-ice.musicradio.com/CapitalMP3");
   //audio.connecttohost("mediaserv30.live-nect MAX98357 I2S Amplifier Module
   //audio.connecttohost("www.surfmusic.de/m3u/100-5-das-hitradio,4529.m3u");
-  //audio.connecttohost("stream.1a-webradio.de/deutsch/mp3-128/vtuner-1a");
+  // audio.connecttohost("stream.1a-webradio.de/deutsch/mp3-128/vtuner-1a");
   // audio.connecttohost("www.antenne.de/webradio/antenne.m3u");
   audio.connecttohost("0n-80s.radionetz.de:8000/0n-70s.mp3");
   Serial.printf("\tIF YOU DO NOT HEAR MUSIC: Reboot the Board By Pressing the \"EN\" button\n");
